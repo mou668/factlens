@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FactLens Check</title><link rel="stylesheet" href="popup.css"></head>
+  <body>
+    <main class="popup-shell">
+      <div class="brand"><img class="mark" src="factlens-mark.svg" alt=""><span>Fact<span class="brand-accent">Lens</span><small>CLAIM REVIEW</small></span></div>
+      <p class="intro">Check the visible article for language and source signals.</p>
+      <button id="check" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 5 5"></path></svg>
+        <span>Check this page</span>
+      </button>
+      <div id="status" role="status" aria-live="polite">Ready to check the active page.</div>
+      <section id="result" aria-live="polite" hidden>
+        <div class="result-topline"><span class="eyebrow">ASSESSMENT</span><span id="confidence"></span></div>
+        <div id="verdict"></div>
+        <strong id="category"></strong>
+        <p id="rationale"></p>
+      </section>
+      <p class="disclaimer">Signals are a starting point, not proof. Verify with reliable sources.</p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

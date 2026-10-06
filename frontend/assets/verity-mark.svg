@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-label="Verity mark">
+  <rect width="96" height="96" rx="16" fill="#10201F"/>
+  <path d="M16 48c8.8-14.1 19.5-21.1 32-21.1S71.2 33.9 80 48C71.2 62.1 60.5 69.1 48 69.1S24.8 62.1 16 48Z" fill="#EFEAE0"/>
+  <circle cx="48" cy="48" r="13" fill="#3F7A5C"/>
+  <circle cx="48" cy="48" r="5" fill="#10201F"/>
+  <path d="M29 22h38M29 74h38" stroke="#D9A441" stroke-width="6" stroke-linecap="round"/>
+</svg>

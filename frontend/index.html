@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FactLens | Claim Signal Review</title>
+    <meta name="description" content="Review language and source signals in articles, headlines, and forwarded claims." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="src/styles.css?v=8" />
+    <link rel="stylesheet" href="src/design-tokens.css?v=14" />
+  </head>
+  <body>
+    <!-- Ambient Background Lighting Orbs & Grid -->
+    <div class="bg-grid"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <!-- 0. CINEMATIC LOGO OPENING ANIMATION SCREEN -->
+    <section class="screen splash-screen" data-screen="splash" aria-label="FactLens introduction">
+      <div class="splash-container">
+        <div class="splash-logo-wrapper">
+          <div class="splash-ring ring-outer"></div>
+          <div class="splash-ring ring-inner"></div>
+          <img class="brand-logo-image splash-logo-mark" src="assets/factlens-mark.svg" alt="FactLens" />
+        </div>
+
+        <div class="splash-brand-text">
+          <h1 class="splash-title">FACT<span class="brand-accent">LENS</span></h1>
+          <p class="splash-subtitle">A clearer way to check a claim</p>
+        </div>
+
+        <p class="splash-ready" role="status">Ready to review</p>
+      </div>
+    </section>
+
+    <main class="app-shell">
+      <!-- Top Header Bar -->
+      <header class="app-header">
+        <div class="brand-lockup" id="header-brand-click" title="Return to claim review">
+          <div class="brand-icon-wrapper">
+            <img class="brand-logo-image header-logo" src="assets/factlens-mark.svg" alt="FactLens" />
+          </div>
+          <div>
+            <div class="brand-status-tag">
+              <span class="pulse-dot green"></span> Claim review workspace
+            </div>
+            <h1 class="brand-title">Fact<span class="brand-accent">Lens</span></h1>
+          </div>
+        </div>
+
+        <nav class="stage-track product-nav" data-workflow-nav aria-label="Main navigation">
+          <button class="stage-pill is-active" data-product-nav="input" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            Detector Studio
+          </button>
+          <button class="stage-pill" data-product-nav="community" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Community Notes
+          </button>
+          <button class="stage-pill" data-product-nav="about" type="button">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+            How It Works
+          </button>
+        </nav>
+
+        <div class="account-panel" data-account-panel>
+          <label class="simple-view-toggle" title="Use a simplified traffic-light result">
+            <input id="simple-mode-toggle" type="checkbox" />
+            <span id="simple-mode-label">Simple view</span>
+          </label>
+          <div class="user-avatar-badge" id="account-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span id="account-name" aria-label="Guest researcher">Guest</span>
+          </div>
+
+          <div class="notification-wrap">
+            <button class="notification-button" id="notification-button" type="button" aria-label="Notifications" aria-expanded="false" aria-controls="notification-panel" title="Notifications" data-count="">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+            </button>
+            <div class="notification-panel" id="notification-panel" role="status"><div class="notification-empty">No notifications yet.</div></div>
+          </div>
+
+          <button class="ghost-action auth-trigger-btn" type="button" id="auth-toggle-btn" title="Sign In or Switch Account">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+            <span id="auth-btn-label">Sign In</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- 1. DETECTOR STUDIO (MAIN WORKSPACE - DIRECT ACCESS) -->
+      <section class="screen" data-screen="input" aria-labelledby="input-title">
+        <div class="screen-heading">
+          <div class="eyebrow-tag">VERIFICATION WORKSPACE</div>
+          <h2 id="input-title">Check a claim</h2>
+          <p class="sub-lead">Review the language and source signals in an article, headline, or forwarded message.</p>
+        </div>
+
+        <!-- Detector Form -->
+        <form class="input-card-form" id="check-form">
+          <div class="textarea-header">
+            <label for="article-text">Article or claim</label>
+            <div class="text-meta-counters">
+              <span><strong id="char-count">0</strong> chars</span>
+              <span aria-hidden="true">•</span>
+              <span><strong id="word-count">0</strong> words</span>
+              <span aria-hidden="true">•</span>
+              <span id="read-time">0 min read</span>
+              <button type="button" class="clear-text-btn" id="clear-text-btn" title="Clear text">Clear</button>
+            </div>
+          </div>
+
+          <div class="textarea-wrapper">
+            <textarea
+              id="article-text"
+              name="article-text"
+              rows="7"
+              placeholder="Paste a headline, article, or forwarded message..."
+            ></textarea>
+
+            <div class="input-tools">
+              <label class="tool-button" for="article-image" title="Attach an image">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <span>Attach image</span>
+              </label>
+              <input id="article-image" type="file" accept="image/*" hidden />
+
+              <button class="tool-button voice-input-button" id="voice-input-button" type="button" aria-pressed="false" aria-describedby="voice-status">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"></path></svg>
+                <span id="voice-input-label">Speak claim</span>
+              </button>
+
+              <div class="tool-select-group">
+                <label class="language-label" for="analysis-language">Input language</label>
+                <select id="analysis-language" aria-label="Input language">
+                  <option value="en">English</option>
+                  <option value="hi">Hindi (हिंदी)</option>
+                  <option value="te">Telugu (తెలుగు)</option>
+                </select>
+              </div>
+            </div>
+            <p class="voice-status" id="voice-status" role="status" aria-live="polite"></p>
+            <p class="language-support-note" id="language-support-note" role="status" hidden></p>
+          </div>
+
+          <details class="source-options">
+            <summary>Source link <span>Optional</span></summary>
+            <div class="source-toggle-row">
+              <label class="source-checkbox-label">
+                <input id="source-toggle" type="checkbox" />
+                <span>Include a source web link</span>
+              </label>
+              <input id="source-url" class="source-url-input" type="url" placeholder="https://example.com/article" disabled />
+            </div>
+          </details>
+
+          <div class="form-action-bar">
+            <span class="trust-guarantee">Results are guidance, not a substitute for source verification.</span>
+            <button class="primary-action glowing-btn main-cta" type="submit">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+              <span>Check this claim</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Optional educational examples -->
+        <details class="sample-presets-card">
+          <summary class="presets-head">
+            <span class="presets-title">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+              Try a sample claim
+            </span>
+            <span class="presets-hint">Examples run immediately</span>
+          </summary>
+
+          <div class="preset-grid">
+            <button type="button" class="preset-card fake" data-preset="fake1" data-autoscan="true">
+              <div class="preset-badge fake">Health claim</div>
+              <p class="preset-text">"SHOCKING SECRET EXPOSED! Doctors are hiding this 100% miracle remedy..."</p>
+              <div class="preset-why"><strong>Signals:</strong> Absolute claims and dramatic language.</div>
+              <div class="preset-action"><span>Check sample</span> &rarr;</div>
+            </button>
+
+            <button type="button" class="preset-card fake" data-preset="fake2" data-autoscan="true">
+              <div class="preset-badge fake">Conspiracy claim</div>
+              <p class="preset-text">"UNBELIEVABLE COVER-UP! Secret government plan revealed to control citizens..."</p>
+              <div class="preset-why"><strong>Signals:</strong> Conspiracy framing and vague attribution.</div>
+              <div class="preset-action"><span>Check sample</span> &rarr;</div>
+            </button>
+
+            <button type="button" class="preset-card real" data-preset="real1" data-autoscan="true">
+              <div class="preset-badge real">Research report</div>
+              <p class="preset-text">"According to a study in Nature Journal, Oxford University developed a new..."</p>
+              <div class="preset-why"><strong>Signals:</strong> Named institutions and attributed data.</div>
+              <div class="preset-action"><span>Check sample</span> &rarr;</div>
+            </button>
+
+            <button type="button" class="preset-card real" data-preset="real2" data-autoscan="true">
+              <div class="preset-badge real">Public health update</div>
+              <p class="preset-text">"Reuters reported that the World Health Organization issued updated health..."</p>
+              <div class="preset-why"><strong>Signals:</strong> Named publisher and agency attribution.</div>
+              <div class="preset-action"><span>Check sample</span> &rarr;</div>
+            </button>
+          </div>
+        </details>
+
+        <!-- Recent Verification History Panel -->
+        <section class="recent-panel">
+          <div class="section-head">
+            <h3>Recent Verification History</h3>
+            <button class="ghost-action" type="button" id="clear-history">Clear History</button>
+          </div>
+          <div class="recent-list" id="recent-list"></div>
+        </section>
+      </section>
+
+      <!-- 2. NEAT & UNDERSTANDABLE AUTHENTICATION SCREEN -->
+      <section class="screen" data-screen="auth" aria-labelledby="auth-title">
+        <div class="auth-layout">
+          <div class="auth-hero">
+            <div class="hero-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              ACCOUNT ACCESS
+            </div>
+            <h2 id="auth-title" class="hero-heading">Sign in to FactLens</h2>
+            <p class="hero-subtext">Save activity and contribute community notes. Scanning is available without an account.</p>
+
+            <details class="access-details">
+              <summary>What does an account add?</summary>
+              <p class="access-summary-copy">Guest access includes scanning and local history. An account lets you publish community notes and sync activity.</p>
+            </details>
+          </div>
+
+          <!-- Auth Panel Card -->
+          <div class="auth-panel-card">
+            <div class="auth-tabs" role="tablist">
+              <button class="auth-tab is-active" type="button" data-auth-tab="login">Sign In</button>
+              <button class="auth-tab" type="button" data-auth-tab="register">Create Account</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form is-active" id="login-form" data-auth-form="login">
+              <div class="field-group">
+                <label for="login-username">Email or Username</label>
+                <div class="input-with-icon">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  <input id="login-username" name="username" type="text" placeholder="name@example.com" autocomplete="username" required />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="login-password">Password</label>
+                <div class="input-with-icon">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  <input id="login-password" name="password" type="password" placeholder="••••••••" autocomplete="current-password" required />
+                  <button type="button" class="password-toggle" data-target="login-password" title="Toggle password view">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+              </div>
+
+              <button class="primary-action glowing-btn" type="submit">
+                <span>Sign in</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </form>
+
+            <!-- Register Form -->
+            <form class="auth-form" id="register-form" data-auth-form="register">
+              <div class="field-group">
+                <label for="register-username">Email or Username</label>
+                <div class="input-with-icon">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                  <input id="register-username" name="username" type="text" placeholder="name@example.com" autocomplete="username" required />
+                </div>
+              </div>
+
+              <div class="field-group">
+                <label for="register-password">Password</label>
+                <div class="input-with-icon">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  <input id="register-password" name="password" type="password" placeholder="At least 6 characters" autocomplete="new-password" minlength="6" required />
+                  <button type="button" class="password-toggle" data-target="register-password" title="Toggle password view">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                  </button>
+                </div>
+                <!-- Real-Time Password Strength Bar -->
+                <div class="password-strength-bar">
+                  <div class="strength-meter-fill" id="strength-meter-fill"></div>
+                </div>
+                <small class="strength-label" id="strength-label">Password strength</small>
+              </div>
+
+              <div class="field-group">
+                <label for="register-confirm-password">Confirm Password</label>
+                <div class="input-with-icon">
+                  <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                  <input id="register-confirm-password" name="confirmPassword" type="password" placeholder="Repeat your password" autocomplete="new-password" minlength="6" required />
+                </div>
+              </div>
+
+              <button class="primary-action glowing-btn" type="submit">
+                <span>Create account</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </form>
+
+            <div class="auth-divider"><span>OR</span></div>
+
+            <button type="button" class="demo-login-btn" id="demo-login-btn">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+              Try demo
+            </button>
+
+            <div class="guest-return-row">
+              <button type="button" class="text-action" id="skip-auth-btn">Continue as guest</button>
+            </div>
+
+            <p class="auth-message" id="auth-message" role="status"></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. SCANNING PROCESSING SCREEN -->
+      <section class="screen" data-screen="scan" aria-labelledby="scan-title">
+        <div class="screen-heading center-head">
+          <div class="eyebrow-tag">CLAIM REVIEW</div>
+          <h2 id="scan-title">Checking claim signals</h2>
+          <p class="sub-lead" id="scan-ticker">Comparing language and source cues...</p>
+        </div>
+
+        <div class="radar-scan-hub">
+          <div class="radar-ring">
+            <div class="radar-sweep"></div>
+            <div class="radar-center">
+              <span id="progress-value">0%</span>
+              <small>Scanned</small>
+            </div>
+          </div>
+
+          <div class="progress-bar-wrap">
+            <div class="progress-bar"><span id="progress-fill"></span></div>
+          </div>
+        </div>
+
+        <div class="model-status-grid" id="scan-models"></div>
+      </section>
+
+      <!-- 4. VERDICT SCREEN -->
+      <section class="screen" data-screen="verdict" aria-labelledby="verdict-title">
+        <div class="verdict-card" id="verdict-band">
+          <div class="verdict-badge-row">
+            <span class="verdict-eyebrow">SIGNAL ASSESSMENT</span>
+            <div class="verdict-confidence-box">
+              <span id="combined-confidence">0%</span>
+              <small>Signal estimate</small>
+            </div>
+          </div>
+
+          <h2 id="verdict-title">Analyzing...</h2>
+          <div class="verdict-category" id="verdict-category">Category pending</div>
+          <p class="rationale-text" id="rationale-text"></p>
+
+          <div class="traffic-light-result" id="traffic-light-result" hidden aria-live="polite">
+            <span class="traffic-light-indicator" id="traffic-light-indicator" aria-hidden="true"></span>
+            <div>
+              <strong id="traffic-light-title"></strong>
+              <p id="traffic-light-copy"></p>
+            </div>
+          </div>
+
+          <div class="verdict-secondary-tags" id="verdict-secondary-tags"></div>
+
+          <details class="result-details">
+            <summary>Signals and source details</summary>
+            <!-- Plain English Risk & Trust Signal Explanation Card -->
+            <div class="signal-breakdown-section">
+            <div class="signal-column">
+              <h4>
+                <span>Risk & Sensationalism Signals</span>
+                <span class="info-badge" title="Phrases, emotional punctuation, or conspiracy cues detected in text">ℹ️ What is this?</span>
+              </h4>
+              <div class="signal-tags-wrapper" id="risk-tags"></div>
+            </div>
+
+            <div class="signal-column">
+              <h4>
+                <span>Credibility & Trust Signals</span>
+                <span class="info-badge" title="Specific data, named news agencies, or empirical quotes detected">ℹ️ What is this?</span>
+              </h4>
+              <div class="signal-tags-wrapper" id="trust-tags"></div>
+            </div>
+            </div>
+
+            <section class="evidence-section">
+              <div class="section-head"><h3>Sources & attribution</h3></div>
+              <div class="evidence-list" id="evidence-list"></div>
+            </section>
+          </details>
+
+          <div class="verdict-action-row">
+            <button class="primary-action glowing-btn" type="button" id="open-breakdown">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              View signal breakdown
+            </button>
+            <button class="secondary-action" type="button" id="open-verification-plan">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11 12 14 22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>
+              Build verification plan
+            </button>
+            <button class="secondary-action" type="button" id="read-verdict-aloud">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7m3-10a9 9 0 0 1 0 13"></path></svg>
+              <span id="read-verdict-label">Read result aloud</span>
+            </button>
+            <span class="speech-output-status" id="speech-output-status" role="status" aria-live="polite"></span>
+            <button class="secondary-action" type="button" data-start-over>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+              Check Another Headline
+            </button>
+            <button class="text-action" type="button" data-open-community>Add Community Context</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen detail-screen verification-plan-screen" data-screen="verification-plan" aria-labelledby="verification-plan-title">
+        <div class="screen-heading">
+          <div class="eyebrow-tag">NEXT STEPS</div>
+          <h2 id="verification-plan-title">Your verification plan</h2>
+          <p class="sub-lead">Use this checklist to trace the claim before you rely on or share it.</p>
+        </div>
+
+        <div class="plan-summary">
+          <span class="eyebrow-tag">ASSESSMENT</span>
+          <strong id="plan-verdict">Pending</strong>
+          <p class="plan-claim" id="plan-claim"></p>
+          <p class="plan-disclaimer">Automated signals are a starting point, not a conclusion.</p>
+        </div>
+
+        <section class="verification-plan-panel" aria-label="Verification checklist">
+          <div class="plan-progress-row">
+            <span>Checklist progress</span>
+            <strong id="plan-progress">0 of 4 complete</strong>
+          </div>
+          <div class="plan-progress-track" id="plan-progress-track" role="progressbar" aria-label="Verification checklist progress" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0">
+            <span id="plan-progress-fill"></span>
+          </div>
+          <ol class="verification-plan-list" id="verification-plan-list"></ol>
+        </section>
+
+        <p class="plan-feedback" id="plan-feedback" role="status" aria-live="polite"></p>
+        <div class="verdict-action-row plan-actions">
+          <button class="primary-action" type="button" id="copy-verification-plan">Copy checklist</button>
+          <button class="secondary-action" type="button" data-back-verdict>Back to assessment</button>
+        </div>
+      </section>
+
+      <!-- 5. MODEL BREAKDOWN DIAGNOSTICS SCREEN -->
+      <section class="screen" data-screen="breakdown" aria-labelledby="breakdown-title">
+        <div class="screen-heading">
+          <div class="eyebrow-tag">QUICK READ</div>
+          <h2 id="breakdown-title">Why this result?</h2>
+          <p class="sub-lead">The strongest cues behind this assessment, at a glance.</p>
+        </div>
+
+        <section class="breakdown-summary" aria-labelledby="breakdown-summary-title">
+          <h3 id="breakdown-summary-title">Key signals</h3>
+          <p id="breakdown-summary-copy"></p>
+          <div class="breakdown-key-signals" id="breakdown-key-signals"></div>
+        </section>
+
+        <details class="breakdown-details">
+          <summary>View detailed scores <span>Four signal lenses and source context</span></summary>
+          <div class="breakdown-grid" id="breakdown-list"></div>
+          <section class="source-trust-panel" id="source-trust-panel"></section>
+        </details>
+
+        <div class="verdict-action-row margin-top-lg">
+          <button class="primary-action glowing-btn" type="button" data-back-verdict>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            Back to Verdict
+          </button>
+          <button class="secondary-action" type="button" data-start-over>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+            Check Another Story
+          </button>
+          <button class="text-action" type="button" data-open-audit>View Audit Trail</button>
+        </div>
+      </section>
+
+      <!-- 6. EVIDENCE DETAIL SCREEN -->
+      <section class="screen detail-screen" data-screen="evidence" aria-labelledby="evidence-title">
+        <div class="screen-heading">
+          <div class="eyebrow-tag">Evidence Detail</div>
+          <h2 id="evidence-title">Source Record</h2>
+          <p class="sub-lead">A source provides contextual verification for the ensemble report.</p>
+        </div>
+        <article class="detail-card" id="evidence-detail"></article>
+        <button class="text-action margin-top-lg" type="button" data-back-verdict>&larr; Back to Verdict</button>
+      </section>
+
+      <!-- 7. COMMUNITY NOTES SCREEN -->
+      <section class="screen detail-screen" data-screen="community" aria-labelledby="community-title">
+        <div class="screen-heading">
+          <div class="eyebrow-tag">Community Context</div>
+          <h2 id="community-title">Community Assessments</h2>
+          <p class="sub-lead">User-contributed context and research notes for news headlines.</p>
+        </div>
+        <div class="community-list" id="community-list"></div>
+        <details class="community-compose">
+          <summary>Add a community assessment</summary>
+          <form class="community-form" id="community-form">
+          <label for="community-article">Article or Claim</label>
+          <textarea id="community-article" rows="4" maxlength="1200" placeholder="Paste the article or claim you want the community to review..."></textarea>
+          <div class="community-verdict-choice">
+            <span>Your Assessment:</span>
+            <label><input type="radio" name="community-verdict" value="real" required /> Real</label>
+            <label><input type="radio" name="community-verdict" value="fake" /> Fake</label>
+          </div>
+          <label for="community-note">Context / Sourcing Notes</label>
+          <textarea id="community-note" rows="3" maxlength="500" placeholder="Add source links or short explanation..."></textarea>
+          <button class="primary-action" type="submit">Submit Community Note</button>
+          </form>
+        </details>
+        <button class="text-action margin-top-lg" type="button" data-product-nav="input">&larr; Back to Detector Studio</button>
+      </section>
+
+      <!-- 8. HOW IT WORKS & ABOUT SCREEN -->
+      <section class="screen about-screen" data-screen="about" aria-labelledby="about-title">
+        <section class="about-hero-card">
+          <div class="eyebrow-tag">ABOUT FACTLENS</div>
+          <h2 id="about-title">About FactLens</h2>
+          <p class="about-hero-lead">We surface language and attribution cues to help you decide what to verify next. A signal is not proof; check the original source.</p>
+          <div class="about-hero-actions">
+            <button class="primary-action" type="button" data-product-nav="input">Check a claim</button>
+          </div>
+        </section>
+
+        <details class="about-details">
+          <summary>What does the review look at?</summary>
+          <p class="about-detail-note">These patterns can guide further research, but they cannot confirm whether a claim is true.</p>
+          <div class="about-section-content">
+            <div class="about-model-list">
+              <article>
+                <div class="model-head-tag">Language pattern</div>
+                <strong>Sequence and tone</strong>
+                <p>Highlights punctuation, capitalization, and emotional language patterns.</p>
+              </article>
+              <article>
+                <div class="model-head-tag">Claim framing</div>
+                <strong>Semantic cues</strong>
+                <p>Highlights sensational claims, certainty language, and conspiracy framing.</p>
+              </article>
+              <article>
+                <div class="model-head-tag">Attribution</div>
+                <strong>Phrase patterns</strong>
+                <p>Looks for named publishers, quoted attribution, and recurring phrase patterns.</p>
+              </article>
+              <article>
+                <div class="model-head-tag">Combined assessment</div>
+                <strong>Signal summary</strong>
+                <p>Combines the language and attribution signals into an initial assessment.</p>
+              </article>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <!-- 9. AUDIT TRAIL SCREEN -->
+      <section class="screen audit-screen" data-screen="audit" aria-labelledby="audit-title">
+        <div class="screen-heading">
+          <div class="eyebrow-tag">Transparency Record</div>
+          <h2 id="audit-title">Model Audit Trail</h2>
+        </div>
+        <pre class="audit-record" id="audit-record">No audit record loaded.</pre>
+        <button class="text-action margin-top-lg" type="button" data-back-breakdown>&larr; Back to Breakdown</button>
+      </section>
+    </main>
+
+    <script src="src/strings.js?v=4"></script>
+    <script src="src/app.js?v=10" defer></script>
+  </body>
+</html>

@@ -1,0 +1,9 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+node_modules/
+.DS_Store
+backend/data/users.json
+backend/data/audit.jsonl

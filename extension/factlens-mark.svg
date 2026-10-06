@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="FactLens logo">
+  <rect width="48" height="48" rx="13" fill="#087E68"/>
+  <circle cx="21" cy="21" r="11" fill="none" stroke="#FFFFFF" stroke-width="2.4"/>
+  <path d="M18 27V15h9M18 21h8" fill="none" stroke="#D8F0E6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m29 29 7 7" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round"/>
+</svg>
