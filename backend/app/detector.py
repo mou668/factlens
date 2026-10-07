@@ -372,10 +372,12 @@ def inspect_media_context(text: str, image_name: str) -> dict:
         return {"relevant": True, "aligned": None, "message": "Media deepfake scan pending API integration", "deepfakeLikelihood": None}
     if not image_name:
         return {"relevant": False, "aligned": None, "message": "No image attached", "deepfakeLikelihood": None}
-    terms = set(re.findall(r"[a-zA-Z]{4,}", text.lower()))
-    image_terms = set(re.findall(r"[a-zA-Z]{4,}", image_name.lower()))
-    aligned = bool(terms & image_terms)
-    return {"relevant": True, "aligned": aligned, "message": "Image context appears aligned" if aligned else "image does not match article context", "deepfakeLikelihood": None}
+    return {
+        "relevant": True,
+        "aligned": None,
+        "message": "Image attached; visual analysis is not available in this prototype.",
+        "deepfakeLikelihood": None,
+    }
 
 
 def verify_rationale(rationale: str, text: str, features: dict) -> dict:

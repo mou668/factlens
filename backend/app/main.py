@@ -11,7 +11,7 @@ from urllib.parse import parse_qs
 from uuid import uuid4
 from xml.etree import ElementTree
 
-from fastapi import FastAPI, Header, HTTPException, Request, Response
+from fastapi import FastAPI, File, Form, Header, HTTPException, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -20,6 +20,13 @@ from app.detector import analyze_text
 USERS_FILE = Path(__file__).resolve().parent.parent / "data" / "users.json"
 COMMUNITY_FILE = USERS_FILE.parent / "community.json"
 SESSIONS = {}
+MAX_IMAGE_BYTES = 5 * 1024 * 1024
+IMAGE_SIGNATURES = {
+    "image/png": (b"\x89PNG\r\n\x1a\n",),
+    "image/jpeg": (b"\xff\xd8\xff",),
+    "image/gif": (b"GIF87a", b"GIF89a"),
+    "image/webp": (b"RIFF",),
+}
 
 
 class AnalyzeRequest(BaseModel):
@@ -99,6 +106,49 @@ def analyze(payload: AnalyzeRequest) -> dict:
         image_name=payload.image_name.strip(),
         language=payload.language.strip() or "en",
     )
+
+
+def validate_uploaded_image(contents: bytes, content_type: str) -> str:
+    if not contents:
+        raise HTTPException(status_code=400, detail="The uploaded image is empty")
+    if len(contents) > MAX_IMAGE_BYTES:
+        raise HTTPException(status_code=413, detail="Choose an image smaller than 5 MB")
+
+    detected_type = next(
+        (
+            image_type
+            for image_type, signatures in IMAGE_SIGNATURES.items()
+            if any(contents.startswith(signature) for signature in signatures)
+            and (image_type != "image/webp" or contents[8:12] == b"WEBP")
+        ),
+        None,
+    )
+    if detected_type is None:
+        raise HTTPException(status_code=415, detail="Upload a valid PNG, JPEG, GIF, or WebP image")
+    if content_type and content_type.lower() != detected_type:
+        raise HTTPException(status_code=415, detail="The uploaded image type does not match its contents")
+    return detected_type
+
+
+@app.post("/analyze-with-image")
+async def analyze_with_image(
+    text: str = Form(..., min_length=1),
+    source_url: str = Form(default="", max_length=2048),
+    language: str = Form(default="en", max_length=12),
+    image: UploadFile = File(...),
+) -> dict:
+    try:
+        contents = await image.read(MAX_IMAGE_BYTES + 1)
+        validate_uploaded_image(contents, image.content_type or "")
+        image_name = (image.filename or "uploaded-image").replace("\\", "/").rsplit("/", 1)[-1][:255]
+        return analyze_text(
+            text.strip(),
+            source_url=source_url.strip(),
+            image_name=image_name,
+            language=language.strip() or "en",
+        )
+    finally:
+        await image.close()
 
 
 @app.get("/community/notes")

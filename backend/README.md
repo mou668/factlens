@@ -27,6 +27,7 @@ The API runs at `http://127.0.0.1:8000`.
 - `POST /auth/register`
 - `POST /auth/login`
 - `POST /analyze`
+- `POST /analyze-with-image` (multipart form with `text`, optional `source_url` and `language`, and an `image` file)
 - `POST /v1/check` (same pipeline for newsroom and extension clients)
 - `POST /webhooks/twilio` (inbound Twilio SMS and WhatsApp messages)
 - `GET /audit/{auditId}`
@@ -43,6 +44,7 @@ Example request:
 ```
 
 The response includes the four model scores plus category, uncertainty state, explainability highlights, evidence records, source trust, spread risk, AI-text signal, media signal, and an `auditId`.
+Image uploads accept PNG, JPEG, GIF, or WebP files up to 5 MB. The upload is validated and used to indicate that image evidence was attached; visual image analysis is not available in this prototype.
 
 ## WhatsApp and SMS
 

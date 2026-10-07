@@ -78,6 +78,9 @@ const SOURCE_TERMS = [
 ];
 
 const API_BASE_URL = "http://127.0.0.1:8000";
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/gif", "image/webp"]);
+let imagePreviewUrl = "";
 
 // DOM Elements
 const screens = document.querySelectorAll("[data-screen]");
@@ -117,6 +120,14 @@ const clearTextBtn = document.querySelector("#clear-text-btn");
 const riskTagsContainer = document.querySelector("#risk-tags");
 const trustTagsContainer = document.querySelector("#trust-tags");
 const imageInput = document.querySelector("#article-image");
+const imagePreview = document.querySelector("#image-upload-preview");
+const imagePreviewImage = document.querySelector("#image-preview-image");
+const imageUploadDetails = document.querySelector("#image-upload-details");
+const imageUploadStatus = document.querySelector("#image-upload-status");
+const removeImageButton = document.querySelector("#remove-image-btn");
+const heroStartButton = document.querySelector("#hero-start-button");
+const heroSampleButton = document.querySelector("#hero-sample-button");
+const samplePresetsCard = document.querySelector(".sample-presets-card");
 const languageInput = document.querySelector("#analysis-language");
 const simpleModeToggle = document.querySelector("#simple-mode-toggle");
 const simpleModeLabel = document.querySelector("#simple-mode-label");
@@ -542,7 +553,7 @@ function clamp(val) {
   return Math.max(0.08, Math.min(0.95, val));
 }
 
-function buildLocalResult(text) {
+function buildLocalResult(text, imageMessage = "No image attached") {
   const feat = extractFeatures(text);
 
   let lstmScore = 0.35 + feat.vagueHits * 0.12 + Math.min(feat.exclamationCount, 4) * 0.08 + Math.min(feat.questionCount, 3) * 0.04 + Math.min(feat.allCapsWords, 5) * 0.07;
@@ -594,24 +605,55 @@ function buildLocalResult(text) {
     sourceTrust: { score: isFake ? 35 : 85, domain: "", basis: isFake ? "Unverified sensational phrases detected" : "Contains credible source framing" },
     spreadRisk: { level: feat.riskSignals.length >= 3 ? "High" : feat.riskSignals.length ? "Medium" : "Low", score: Math.min(100, feat.riskSignals.length * 20) },
     aiSignal: { label: "Likely human-written", flagged: false, score: 28 },
-    mediaSignal: { relevant: false, aligned: null, message: "No image attached" },
+    mediaSignal: {
+      relevant: imageMessage !== "No image attached",
+      aligned: null,
+      message: imageMessage,
+    },
     auditId: "local-preview",
   };
 }
 
 async function analyzeText(text, options = {}) {
   try {
-    const response = await fetch(`${API_BASE_URL}/analyze`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text, source_url: options.sourceUrl || "", image_name: options.imageName || "", language: options.language || "en" }),
-    });
+    let response;
+    if (options.imageFile) {
+      const formData = new FormData();
+      formData.set("text", text);
+      formData.set("source_url", options.sourceUrl || "");
+      formData.set("language", options.language || "en");
+      formData.set("image", options.imageFile);
+      response = await fetch(`${API_BASE_URL}/analyze-with-image`, {
+        method: "POST",
+        body: formData,
+      });
+    } else {
+      response = await fetch(`${API_BASE_URL}/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, source_url: options.sourceUrl || "", language: options.language || "en" }),
+      });
+    }
 
-    if (!response.ok) throw new Error(`API error ${response.status}`);
+    if (!response.ok) {
+      if (options.imageFile) {
+        const errorBody = await response.json().catch(() => ({}));
+        return buildLocalResult(
+          text,
+          `Image upload failed: ${errorBody.detail || `request error ${response.status}`}. Only text was reviewed.`,
+        );
+      }
+      throw new Error(`API error ${response.status}`);
+    }
     return normalizeBackendResult(await response.json());
   } catch (err) {
     console.log("Using deterministic local detection engine:", err.message);
-    return buildLocalResult(text);
+    return buildLocalResult(
+      text,
+      options.imageFile
+        ? "Image was not uploaded because the analysis service is unavailable; only text was reviewed."
+        : "No image attached",
+    );
   }
 }
 
@@ -800,6 +842,12 @@ function renderVerdict() {
     spreadTag.className = `secondary-tag spread-${String(latestResult.spreadRisk.level).toLowerCase()}`;
     spreadTag.textContent = `Spread risk: ${latestResult.spreadRisk.level}`;
     verdictSecondaryTags.append(spreadTag);
+    if (latestResult.mediaSignal?.relevant) {
+      const mediaTag = document.createElement("span");
+      mediaTag.className = "secondary-tag media-tag";
+      mediaTag.textContent = latestResult.mediaSignal.message;
+      verdictSecondaryTags.append(mediaTag);
+    }
     if (latestResult.aiSignal.flagged) {
       const aiTag = document.createElement("span");
       aiTag.className = "secondary-tag ai-tag";
@@ -1122,6 +1170,11 @@ if (form) {
     e.preventDefault();
     const text = textarea.value.trim();
     if (!text) return;
+    const imageFile = imageInput?.files?.[0];
+    if (imageFile && imageFile.size > MAX_IMAGE_SIZE) {
+      if (imageUploadStatus) imageUploadStatus.textContent = "Choose an image smaller than 5 MB.";
+      return;
+    }
     if (/[\u0900-\u097f\u0c00-\u0c7f]/.test(text)) {
       updateLanguageSupportNote();
       languageSupportNote?.focus();
@@ -1129,10 +1182,56 @@ if (form) {
     }
     startScan(text, {
       sourceUrl: sourceToggle && sourceToggle.checked && sourceUrlInput ? sourceUrlInput.value.trim() : "",
-      imageName: imageInput && imageInput.files[0] ? imageInput.files[0].name : "",
+      imageFile,
       language: languageInput ? languageInput.value : "en",
     });
   });
+}
+
+function clearImagePreview() {
+  if (imagePreviewUrl) {
+    URL.revokeObjectURL(imagePreviewUrl);
+    imagePreviewUrl = "";
+  }
+  if (imagePreview) imagePreview.hidden = true;
+  if (imagePreviewImage) imagePreviewImage.removeAttribute("src");
+  if (imageUploadDetails) imageUploadDetails.textContent = "";
+  if (imageUploadStatus) imageUploadStatus.textContent = "";
+}
+
+function clearImageSelection() {
+  clearImagePreview();
+  if (imageInput) imageInput.value = "";
+}
+
+if (imageInput) {
+  imageInput.addEventListener("change", () => {
+    clearImagePreview();
+    const imageFile = imageInput.files?.[0];
+    if (!imageFile) return;
+    if (imageFile.size > MAX_IMAGE_SIZE) {
+      if (imageUploadStatus) imageUploadStatus.textContent = "Choose an image smaller than 5 MB.";
+      imageInput.value = "";
+      return;
+    }
+    if (imageFile.type && !ALLOWED_IMAGE_TYPES.has(imageFile.type)) {
+      if (imageUploadStatus) imageUploadStatus.textContent = "Choose a PNG, JPEG, GIF, or WebP image.";
+      imageInput.value = "";
+      return;
+    }
+    imagePreviewUrl = URL.createObjectURL(imageFile);
+    if (imagePreviewImage) imagePreviewImage.src = imagePreviewUrl;
+    if (imageUploadDetails) {
+      const sizeInKb = Math.max(1, Math.round(imageFile.size / 1024));
+      imageUploadDetails.textContent = `${imageFile.name} · ${sizeInKb} KB`;
+    }
+    if (imagePreview) imagePreview.hidden = false;
+    if (imageUploadStatus) imageUploadStatus.textContent = "";
+  });
+}
+
+if (removeImageButton) {
+  removeImageButton.addEventListener("click", clearImageSelection);
 }
 
 if (textarea) {
@@ -1210,7 +1309,16 @@ if (readVerdictAloud) {
       return;
     }
 
-    const utterance = new SpeechSynthesisUtterance(`${trafficLightTitle.textContent} ${trafficLightCopy.textContent}`);
+    const resultText = [verdictTitle?.textContent, rationaleText?.textContent]
+      .map((part) => part?.trim())
+      .filter(Boolean)
+      .join(". ");
+    if (!resultText) {
+      if (speechOutputStatus) speechOutputStatus.textContent = "There is no assessment to read yet.";
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(resultText);
     utterance.lang = { en: "en-US", hi: "hi-IN", te: "te-IN" }[languageInput?.value || "en"] || "en-US";
     utterance.onstart = () => {
       readVerdictAloud.setAttribute("aria-pressed", "true");
@@ -1252,6 +1360,20 @@ document.querySelectorAll("[data-preset]").forEach((btn) => {
     }
   });
 });
+
+if (heroStartButton && textarea) {
+  heroStartButton.addEventListener("click", () => {
+    textarea.focus();
+  });
+}
+
+if (heroSampleButton && samplePresetsCard) {
+  heroSampleButton.addEventListener("click", () => {
+    samplePresetsCard.open = true;
+    samplePresetsCard.scrollIntoView({ behavior: "smooth", block: "start" });
+    samplePresetsCard.querySelector("[data-preset]")?.focus({ preventScroll: true });
+  });
+}
 
 if (loginForm) {
   loginForm.addEventListener("submit", (e) => {
@@ -1444,6 +1566,12 @@ document.querySelectorAll("[data-start-over]").forEach((button) => {
     scanRunId += 1;
     clearTimers();
     if (textarea) textarea.value = "";
+    clearImageSelection();
+    if (sourceToggle) sourceToggle.checked = false;
+    if (sourceUrlInput) {
+      sourceUrlInput.value = "";
+      sourceUrlInput.disabled = true;
+    }
     updateTextStats();
     setScreen("input");
   });

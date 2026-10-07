@@ -355,6 +355,20 @@ textarea:focus { outline: none; border-color: var(--cyan); box-shadow: 0 0 0 3px
   border: 1px solid var(--border-subtle); color: var(--text-soft); font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
 }
 .tool-button:hover { background: rgba(255, 255, 255, 0.1); color: #FFF; }
+.tool-button[for="article-image"] { cursor: pointer; }
+.image-upload-preview {
+  display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 10px 12px;
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-sm);
+  background: rgba(10, 15, 26, 0.75);
+}
+.image-upload-preview[hidden] { display: none; }
+.image-upload-preview img {
+  width: 52px; height: 52px; border-radius: 6px; object-fit: cover;
+  border: 1px solid var(--border-subtle);
+}
+.image-upload-details { flex: 1; min-width: 0; color: var(--text-soft); font-size: 0.82rem; overflow-wrap: anywhere; }
+.image-upload-status { min-height: 0; margin-top: 6px; color: var(--fake); font-size: 0.8rem; }
+.image-upload-status:empty { display: none; }
 .tool-select-group { display: flex; align-items: center; gap: 8px; }
 .language-label { font-size: 0.8rem; color: var(--text-muted); }
 

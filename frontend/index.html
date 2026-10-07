@@ -11,8 +11,8 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="src/styles.css?v=8" />
-    <link rel="stylesheet" href="src/design-tokens.css?v=14" />
+    <link rel="stylesheet" href="src/styles.css?v=9" />
+    <link rel="stylesheet" href="src/design-tokens.css?v=16" />
   </head>
   <body>
     <!-- Ambient Background Lighting Orbs & Grid -->
@@ -95,14 +95,31 @@
 
       <!-- 1. DETECTOR STUDIO (MAIN WORKSPACE - DIRECT ACCESS) -->
       <section class="screen" data-screen="input" aria-labelledby="input-title">
-        <div class="screen-heading">
-          <div class="eyebrow-tag">VERIFICATION WORKSPACE</div>
-          <h2 id="input-title">Check a claim</h2>
-          <p class="sub-lead">Review the language and source signals in an article, headline, or forwarded message.</p>
-        </div>
+        <div class="input-hero">
+          <div class="input-hero-inner">
+            <div class="input-hero-copy">
+              <div class="eyebrow-tag">A CLEARER WAY TO CHECK A CLAIM</div>
+              <h2 id="input-title">Check. <span>Verify.</span><br />Share wisely.</h2>
+              <p class="input-hero-lead">Review the language and source signals behind an article, headline, or forwarded message — then decide what to verify next.</p>
+              <div class="input-hero-actions">
+                <button class="primary-action" id="hero-start-button" type="button">Check a claim <span aria-hidden="true">→</span></button>
+                <button class="secondary-action" id="hero-sample-button" type="button">Try a sample</button>
+              </div>
+              <ul class="input-hero-benefits" aria-label="FactLens features">
+                <li>Language signal review</li>
+                <li>Optional source context</li>
+                <li>Practical verification plan</li>
+              </ul>
+            </div>
 
-        <!-- Detector Form -->
-        <form class="input-card-form" id="check-form">
+            <div class="input-hero-panel">
+              <div class="input-hero-panel-head">
+                <span class="input-hero-live-dot" aria-hidden="true"></span>
+                <span>CLAIM REVIEW WORKSPACE</span>
+                <span class="input-hero-private">No account needed</span>
+              </div>
+              <!-- Detector Form -->
+              <form class="input-card-form" id="check-form">
           <div class="textarea-header">
             <label for="article-text">Article or claim</label>
             <div class="text-meta-counters">
@@ -128,7 +145,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
                 <span>Attach image</span>
               </label>
-              <input id="article-image" type="file" accept="image/*" hidden />
+              <input id="article-image" type="file" accept="image/png,image/jpeg,image/gif,image/webp" hidden />
 
               <button class="tool-button voice-input-button" id="voice-input-button" type="button" aria-pressed="false" aria-describedby="voice-status">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="2" width="6" height="12" rx="3"></rect><path d="M5 10v2a7 7 0 0 0 14 0v-2M12 19v3m-4 0h8"></path></svg>
@@ -144,6 +161,12 @@
                 </select>
               </div>
             </div>
+            <div class="image-upload-preview" id="image-upload-preview" hidden aria-live="polite">
+              <img id="image-preview-image" alt="Selected image preview" />
+              <span class="image-upload-details" id="image-upload-details"></span>
+              <button class="clear-text-btn" id="remove-image-btn" type="button" aria-label="Remove attached image">Remove</button>
+            </div>
+            <p class="image-upload-status" id="image-upload-status" role="status" aria-live="polite"></p>
             <p class="voice-status" id="voice-status" role="status" aria-live="polite"></p>
             <p class="language-support-note" id="language-support-note" role="status" hidden></p>
           </div>
@@ -166,7 +189,16 @@
               <span>Check this claim</span>
             </button>
           </div>
-        </form>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-value-strip" aria-label="How FactLens helps">
+          <div><strong>Review</strong><span>Language and claim framing</span></div>
+          <div><strong>Trace</strong><span>Sources and attribution</span></div>
+          <div><strong>Verify</strong><span>Concrete next steps</span></div>
+        </div>
 
         <!-- Optional educational examples -->
         <details class="sample-presets-card">
@@ -581,6 +613,6 @@
     </main>
 
     <script src="src/strings.js?v=4"></script>
-    <script src="src/app.js?v=10" defer></script>
+    <script src="src/app.js?v=11" defer></script>
   </body>
 </html>
