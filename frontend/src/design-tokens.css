@@ -288,6 +288,14 @@ select,
   color: var(--text-main);
 }
 textarea { min-height: 190px; padding: 18px; background: #FFFFFF; font-size: 1rem; line-height: 1.65; }
+#article-text,
+#article-text:focus {
+  background-color: #FFFFFF !important;
+  color: #1C2D28 !important;
+  -webkit-text-fill-color: #1C2D28;
+  color-scheme: light;
+  caret-color: #087E68;
+}
 textarea:focus,
 input:focus,
 select:focus,
@@ -716,6 +724,51 @@ button:disabled { cursor: wait; }
 .stage-pill.is-active { background: #E7F4EF; border-color: #C6E1D7; color: #125B4F; }
 .text-action { color: #117B72; }
 
+.input-hero-panel .source-options {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 10px;
+}
+.input-hero-panel .source-options > summary {
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: #FBFCFC;
+  color: var(--text-soft);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+.input-hero-panel .source-options > summary::after { font-size: 0.95rem; }
+.input-hero-panel .source-options > summary span { margin-left: 0; font-size: 0.7rem; }
+.input-hero-panel .source-options[open] { width: 100%; }
+.input-hero-panel .source-options .source-toggle-row {
+  align-items: center;
+  gap: 8px;
+  margin: 8px 0 0;
+}
+.input-hero-panel .source-checkbox-label {
+  gap: 6px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.input-hero-panel .source-checkbox-label input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 15px;
+  margin: 0;
+  padding: 0;
+  accent-color: var(--cyan);
+}
+.input-hero-panel .source-url-input {
+  min-width: min(220px, 100%);
+  height: 34px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
 @media (max-width: 1024px) {
   .app-shell { padding-inline: clamp(18px, 4vw, 38px); }
   .app-header { gap: 10px; }
@@ -746,4 +799,5 @@ button:disabled { cursor: wait; }
   .input-hero-panel .input-card-form { padding: 16px; }
   .input-hero-panel .form-action-bar { align-items: stretch; }
   .input-hero-panel .form-action-bar .primary-action { width: 100%; }
+  .input-hero-panel .source-url-input { min-width: 100%; }
 }
